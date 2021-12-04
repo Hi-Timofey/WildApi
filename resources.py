@@ -1,21 +1,53 @@
 from flask import request
-from flask_restful import Resource, abort
+from flask_restful import Resource, abort, reqparse
+import werkzeug
 
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
-from db import db_session
 
+from db import db_session
+from db.photo import Photo
 from db.status import Status
 from status_schema import StatusSchema
 from db.volunteer import Volunteer
 from volunteer_schema import  VolunteerSchema
 
+import os
+from uuid import uuid4
+
+
+UPLOAD_DIR = './photos'
+PHOTOS_ENDPOINT = '/api/photos'
+
 
 VOLUNTEERS_ENDPOINT = '/api/volunteers'
 STATUSES_ENDPOINT = '/api/statuses'
 
+
 status_schema = StatusSchema()
 volunteer_schema = VolunteerSchema()
+
+class UploadPhoto(Resource):
+    def post(self):
+        parse = reqparse.RequestParser()
+        parse.add_argument('photo', type=werkzeug.datastructures.FileStorage, location='files')
+        args = parse.parse_args()
+        breakpoint()
+        try:
+            photo_file = args['photo']
+            photo_uuid = uuid4()
+            photo_filename = f"photo{photo_uuid}.{photo_file.content_type.split('/')[1]}"
+
+            photo_file.save(os.path.join(UPLOAD_DIR, photo_filename))
+            photo = Photo(filename=photo_filename)
+            db = db_session.create_session()
+            db.add(photo)
+        except:
+            abort(500, message='Unexpected Error!')
+        else:
+            db.commit()
+            return {"photo_id": photo.id}, 200
+
 
 class StatusResource(Resource):
     def _get_all_statuses(self):

@@ -20,11 +20,13 @@ def create_app():
 
     from resources import VolunteersResource, VOLUNTEERS_ENDPOINT
     from resources import StatusResource, STATUSES_ENDPOINT
+    from resources import UploadPhoto, PHOTOS_ENDPOINT
 
 
     api = Api(app)
     api.add_resource(VolunteersResource, VOLUNTEERS_ENDPOINT, f'{VOLUNTEERS_ENDPOINT}/<id>')
     api.add_resource(StatusResource, STATUSES_ENDPOINT, f'{STATUSES_ENDPOINT}/<id>')
+    api.add_resource(UploadPhoto,PHOTOS_ENDPOINT)
 
     app.config.from_envvar('API_CONFIG')
     app.run(host='0.0.0.0', port=8080)
