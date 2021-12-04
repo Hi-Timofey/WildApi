@@ -2,7 +2,6 @@ from sqlalchemy import Column
 from sqlalchemy import create_engine, Column, Integer, String, Date, Boolean, ForeignKey
 from sqlalchemy import orm
 
-from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 
 from .db_session import SqlAlchemyBase
 
@@ -47,10 +46,10 @@ class Volunteer(SqlAlchemyBase):
         return f"Volunteer({self.id}, {self.name})"
 
 
-class VolunteerSchema(SQLAlchemyAutoSchema):
-    class Meta:
-        model = Volunteer
-        load_instance = True
+# class VolunteerSchema(SQLAlchemyAutoSchema):
+#     class Meta:
+#         model = Volunteer
+#         load_instance = True
 
 '''
     id = Integer
