@@ -7,6 +7,10 @@ SqlAlchemyBase = dec.declarative_base()
 
 __factory = None
 
+
+def _after_init_db():
+    pass
+
 def global_init_sqlite(db_file):
     global __factory
 
@@ -25,6 +29,8 @@ def global_init_sqlite(db_file):
     from . import __all_models
 
     SqlAlchemyBase.metadata.create_all(engine)
+
+    _after_init_db()
 
 
 def create_session() -> Session:

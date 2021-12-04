@@ -48,4 +48,32 @@ class VolunteersResource(Resource):
         else:
             return {"volunteer_id":volunteer.id}, 201
 
+    def patch(self, id=None):
+        json = request.get_json()
+        if not id:
+            abort(400, message='Bad Request')
+        try:
+            db = db_session.create_session()
+            volunteer = db.query(Volunteer).filter(Volunteer.id==id).first()
+            if volunteer is None:
+                raise  ValueError
+
+            for key in json:
+                setattr(volunteer, key, json[key])
+
+            db.add(volunteer)
+            db.commit()
+            # print(json)
+            # print(volunteer)
+            # breakpoint()
+
+        except ValueError as ve:
+            abort(400, message='Bad Request')
+        except BaseException as be:
+            breakpoint()
+            abort(500, message='Unexpected Error!')
+        else:
+            return {"volunteer_id":volunteer.id}, 201
+
+
 

@@ -3,8 +3,10 @@ from flask import Flask
 from flask_restful import Api
 
 # from db.volunteer import Volunteer
-from volunteer_resource import VolunteersResource, VOLUNTEERS_ENDPOINT
 from db import db_session
+
+from db.status import Status
+from db.volunteer import Volunteer
 
 app = Flask(__name__)
 
@@ -16,6 +18,7 @@ def index():
 def create_app():
     db_session.global_init_sqlite('db.sqlite')
     api = Api(app)
+    from volunteer_resource import VolunteersResource, VOLUNTEERS_ENDPOINT
     api.add_resource(VolunteersResource, VOLUNTEERS_ENDPOINT, f'{VOLUNTEERS_ENDPOINT}/<id>')
 
     app.config.from_envvar('API_CONFIG')

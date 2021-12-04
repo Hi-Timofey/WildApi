@@ -1,5 +1,5 @@
 from sqlalchemy import Column
-from sqlalchemy import create_engine, Column, Integer, String, Date, Boolean
+from sqlalchemy import create_engine, Column, Integer, String, Date, Boolean, ForeignKey
 from sqlalchemy import orm
 
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
@@ -9,7 +9,11 @@ from .db_session import SqlAlchemyBase
 class Volunteer(SqlAlchemyBase):
     __tablename__ = 'volunteers'
 
-    id = Column('volunteer_id', Integer, primary_key=True)
+    id = Column('volunteer_id', Integer,
+                        primary_key=True, autoincrement=True, unique=True)
+    volunteer_status_id = Column(Integer, ForeignKey('statuses.status_id'))
+    volunteer_status = orm.relation('Status', back_populates='volunteers_with_status',viewonly=True)
+
 
     name = Column(String, nullable=False)
     surname = Column(String, nullable=False)
@@ -37,6 +41,10 @@ class Volunteer(SqlAlchemyBase):
     motivation_letter = Column(String)
 
     comment = Column(String)
+
+
+    def __repr__(self):
+        return f"Volunteer({self.id}, {self.name})"
 
 
 class VolunteerSchema(SQLAlchemyAutoSchema):
