@@ -1,0 +1,19 @@
+API:
+  VOLUNTEERS
+    POST api/volunteers json - добавить волонтёра
+    GET api/volunteers/<int> - получить JSON волонтёра по id
+    PATCH api/volunteers/<int> json - изменить у конкретного волонтёра поля (передаются в json)
+  
+  STATUSES:
+    GET api/statuses - получить JSON статусов волонтёров
+    POST api/statuses json - добавить статуст волон.
+  
+  PHOTOS:
+    POST api/photos form-data - закинуть фотографию
+      photo - через form-data  картинку
+      owner_id - int чьё фото
+    GET api/photos?owner_id=<ind> - получить все фото в JSON определенного волон.
+    GET api/photos/<int> - получить JSON конкретной фотографии
+    GET photos/photo64a25e84-7023-4ad4-8690-cb02bad5d3ea.jpeg - прямая ссылка на фотографию
+      соответственно чтобы получиь картинку пользователя нужно сперва узнать име картинки
+      затем сделать запрос в photos/<filename> и получить изображение

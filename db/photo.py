@@ -11,7 +11,9 @@ class Photo(SqlAlchemyBase):
     __tablename__ = 'photos'
 
     id = Column('photo_id', Integer,
-                        primary_key=True, autoincrement=True, unique=True)
+                primary_key=True, autoincrement=True, unique=True)
     filename = Column(String, nullable=False)
     upload_time = Column(DateTime, default=datetime.datetime.utcnow)
 
+    owner_id = Column(Integer, ForeignKey("volunteers.volunteer_id"))
+    owner = orm.relation('Volunteer', back_populates='photo')

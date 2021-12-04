@@ -37,7 +37,22 @@ class UploadPhoto(Resource):
             raise ValueError('no such status')
         return photo_schema.dump(photo)
 
-    def get(self, id):
+    def _get_all_photos_by_id(self, owner_id):
+        db = db_session.create_session()
+        photos = db.query(Photo).filter(Photo.owner_id == owner_id).all()
+        breakpoint()
+        if photos is None or photos == []:
+            raise ValueError("not found")
+        photos_json = [photo_schema.dump(photo)  for photo in photos]
+        return photos_json
+
+    def get(self, id=None):
+        breakpoint()
+        if not id:
+            owner_id = int(request.args.get("owner_id"))
+
+            return  self._get_all_photos_by_id(owner_id),200
+
         try:
             return self._get_photo_by_id(id), 200
         except BaseException:
@@ -46,17 +61,32 @@ class UploadPhoto(Resource):
     def post(self):
         parse = reqparse.RequestParser()
         parse.add_argument('photo', type=werkzeug.datastructures.FileStorage, location='files')
+        parse.add_argument('owner_id', type=int)
         args = parse.parse_args()
-        breakpoint()
         try:
             photo_file = args['photo']
             photo_uuid = uuid4()
             photo_filename = f"photo{photo_uuid}.{photo_file.content_type.split('/')[1]}"
 
-            photo_file.save(os.path.join(UPLOAD_DIR, photo_filename))
-            photo = Photo(filename=photo_filename)
+
             db = db_session.create_session()
+
+            photo = Photo(filename=photo_filename)
+
+            if args['owner_id']:
+                volun = db.query(Volunteer).filter(Volunteer.id == int(args['owner_id'])).first()
+                if volun is None:
+                    raise ValueError
+                photo.owner = volun
+
+            photo_file.save(os.path.join(UPLOAD_DIR, photo_filename))
             db.add(photo)
+        except ValueError as ve:
+            abort(400, message='Bad Request')
+            db.rollback()
+        except KeyError as ke:
+            abort(400, message='Bad Request')
+            db.rollback()
         except:
             abort(500, message='Unexpected Error!')
             db.rollback()
@@ -108,7 +138,6 @@ class StatusResource(Resource):
 
 class VolunteersResource(Resource):
     def get(self, id=None):
-        breakpoint()
         if not id:
             status_id = request.args.get('status_id')
             return self._get_all_volunteers(status_id), 200
@@ -139,7 +168,6 @@ class VolunteersResource(Resource):
         json = request.get_json()
         try:
             db = db_session.create_session()
-            breakpoint()
             volunteer = volunteer_schema.load(json, session=db)
             db.add(volunteer)
             db.commit()
@@ -169,12 +197,10 @@ class VolunteersResource(Resource):
             db.commit()
             # print(json)
             # print(volunteer)
-            # breakpoint()
 
         except ValueError as ve:
             abort(400, message='Bad Request')
         except BaseException as be:
-            breakpoint()
             abort(500, message='Unexpected Error!')
         else:
             return {"volunteer_id":volunteer.id}, 201

@@ -5,14 +5,19 @@ from sqlalchemy import orm
 
 from .db_session import SqlAlchemyBase
 
+
 class Volunteer(SqlAlchemyBase):
     __tablename__ = 'volunteers'
 
     id = Column('volunteer_id', Integer,
-                        primary_key=True, autoincrement=True, unique=True)
+                primary_key=True, autoincrement=True, unique=True)
     volunteer_status_id = Column(Integer, ForeignKey('statuses.status_id'))
-    volunteer_status = orm.relation('Status', back_populates='volunteers_with_status',viewonly=True)
+    volunteer_status = orm.relation(
+        'Status',
+        back_populates='volunteers_with_status',
+        viewonly=True)
 
+    photo = orm.relation("Photo", back_populates='owner')
 
     name = Column(String, nullable=False)
     surname = Column(String, nullable=False)
@@ -31,7 +36,6 @@ class Volunteer(SqlAlchemyBase):
     recommendations = Column(String)
     volunteer_book = Column(Boolean, nullable=False)
 
-
     travel_place = Column(String, nullable=False)
     target_place = Column(String, nullable=False)
     start_date = Column(Date, nullable=False)
@@ -40,7 +44,6 @@ class Volunteer(SqlAlchemyBase):
     motivation_letter = Column(String)
 
     comment = Column(String)
-
 
     def __repr__(self):
         return f"Volunteer({self.id}, {self.name})"
