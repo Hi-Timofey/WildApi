@@ -7,6 +7,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from db import db_session
 from db.photo import Photo
+from photo_schema import PhotoSchema
 from db.status import Status
 from status_schema import StatusSchema
 from db.volunteer import Volunteer
@@ -24,10 +25,24 @@ VOLUNTEERS_ENDPOINT = '/api/volunteers'
 STATUSES_ENDPOINT = '/api/statuses'
 
 
+photo_schema = PhotoSchema()
 status_schema = StatusSchema()
 volunteer_schema = VolunteerSchema()
 
 class UploadPhoto(Resource):
+    def _get_photo_by_id(self, id):
+        db = db_session.create_session()
+        photo = db.query(Photo).filter(Photo.id == id).first()
+        if Photo is None:
+            raise ValueError('no such status')
+        return photo_schema.dump(photo)
+
+    def get(self, id):
+        try:
+            return self._get_photo_by_id(id), 200
+        except BaseException:
+            abort(404, message='Photo not found')
+
     def post(self):
         parse = reqparse.RequestParser()
         parse.add_argument('photo', type=werkzeug.datastructures.FileStorage, location='files')
@@ -44,9 +59,10 @@ class UploadPhoto(Resource):
             db.add(photo)
         except:
             abort(500, message='Unexpected Error!')
+            db.rollback()
         else:
             db.commit()
-            return {"photo_id": photo.id}, 200
+            return photo_schema.dump(photo), 200
 
 
 class StatusResource(Resource):
@@ -58,11 +74,9 @@ class StatusResource(Resource):
 
     def _get_status_by_id(self, id):
         db = db_session.create_session()
-        breakpoint()
         status = db.query(Status).filter(Status.id == id).first()
         if status is None:
             raise ValueError('no such status')
-
         return status_schema.dump(status)
 
     def get(self, id=None):

@@ -14,3 +14,4 @@ class Photo(SqlAlchemyBase):
                         primary_key=True, autoincrement=True, unique=True)
     filename = Column(String, nullable=False)
     upload_time = Column(DateTime, default=datetime.datetime.utcnow)
+
