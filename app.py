@@ -10,6 +10,9 @@ from db.volunteer import Volunteer
 
 app = Flask(__name__)
 
+@app.route('/')
+def hello():
+    return "i'm fine...."
 
 @app.route('/photos/<path:filename>', methods=['GET'])
 def download_photo(filename):

@@ -40,14 +40,12 @@ class UploadPhoto(Resource):
     def _get_all_photos_by_id(self, owner_id):
         db = db_session.create_session()
         photos = db.query(Photo).filter(Photo.owner_id == owner_id).all()
-        breakpoint()
         if photos is None or photos == []:
             raise ValueError("not found")
         photos_json = [photo_schema.dump(photo)  for photo in photos]
         return photos_json
 
     def get(self, id=None):
-        breakpoint()
         if not id:
             owner_id = int(request.args.get("owner_id"))
 
@@ -96,6 +94,31 @@ class UploadPhoto(Resource):
 
 
 class StatusResource(Resource):
+
+    def patch(self, id=None):
+        json = request.get_json()
+        if not id:
+            abort(400, message='Bad Request')
+        try:
+            db = db_session.create_session()
+            status = db.query(Status).filter(Status.id==id).first()
+            if volunteer is None:
+                raise  ValueError
+
+            for key in json:
+                setattr(status, key, json[key])
+
+            db.add(status)
+            db.commit()
+        except ValueError as ve:
+            abort(400, message='Bad Request')
+        except BaseException as be:
+            abort(500, message='Unexpected Error!')
+        else:
+            return {"status_id":status.id}, 201
+
+        pass
+
     def _get_all_statuses(self):
         db = db_session.create_session()
         statuses = db.query(Status).all()
@@ -139,8 +162,12 @@ class StatusResource(Resource):
 class VolunteersResource(Resource):
     def get(self, id=None):
         if not id:
-            status_id = request.args.get('status_id')
-            return self._get_all_volunteers(status_id), 200
+            try:
+                status_id = int(request.args.get('status_id'))
+                return self._get_all_volunteers(status_id), 200
+            except Exception:
+                abort(500, message='Unexpected Error!')
+                return
 
         try:
             return self._get_volunteer_by_id(id), 200
