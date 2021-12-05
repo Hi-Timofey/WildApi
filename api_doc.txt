@@ -3,10 +3,12 @@ API:
     POST api/volunteers json - добавить волонтёра
     GET api/volunteers/<int> - получить JSON волонтёра по id
     PATCH api/volunteers/<int> json - изменить у конкретного волонтёра поля (передаются в json)
+    DELETE api/volunteers/<int> - удалить
   
   STATUSES:
     GET api/statuses - получить JSON статусов волонтёров
     POST api/statuses json - добавить статуст волон.
+    DELETE api/statuses/<int> - удалить
   
   PHOTOS:
     POST api/photos form-data - закинуть фотографию
@@ -17,3 +19,16 @@ API:
     GET photos/photo64a25e84-7023-4ad4-8690-cb02bad5d3ea.jpeg - прямая ссылка на фотографию
       соответственно чтобы получиь картинку пользователя нужно сперва узнать име картинки
       затем сделать запрос в photos/<filename> и получить изображение
+    DELETE api/photos/<int> - удалить
+
+
+  VIDEOS:
+    POST api/videos form-data - закинуть видео
+      video - через form-data  видео
+      owner_id - int чьё видео
+    GET api/videos?owner_id=<ind> - получить все видео в JSON определенного волон.
+    GET api/videos/<int> - получить JSON конкретного видео
+    GET videos/video64a25e84-7023-4ad4-8690-cb02bad5d3ea.mp4 - прямая ссылка на видео
+      соответственно чтобы получиь видео пользователя нужно сперва узнать имя картинки
+      затем сделать запрос в videos/<filename> и получить видео
+    DELETE api/videos/<int> - удалить

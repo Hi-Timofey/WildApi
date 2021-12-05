@@ -18,6 +18,7 @@ class Volunteer(SqlAlchemyBase):
         viewonly=True)
 
     photo = orm.relation("Photo", back_populates='owner')
+    video = orm.relation("Video", back_populates='owner')
 
     name = Column(String, nullable=False)
     surname = Column(String, nullable=False)
